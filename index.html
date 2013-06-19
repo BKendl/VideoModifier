@@ -132,7 +132,7 @@
 					<input class="blurInput controlInput" type="range" min="0" max="100" value="0" onchange="changeValue(this)" />
 				</div>
 			</div>
-		<div>
+		</div>
 	</div>
 	<script>
 		var n = navigator;
@@ -180,7 +180,7 @@
 		}
 		
 		if (n.getUserMedia) {
-			n.getUserMedia({video: true, audio: true}, onSuccess, onError);
+			n.getUserMedia('video', onSuccess, onError);
 		} else if (n.webkitGetUserMedia) {
 			is_webkit = true;
 			n.webkitGetUserMedia({video:true, audio:true}, onSuccess, onError);
