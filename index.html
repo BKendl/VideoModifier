@@ -1,0 +1,203 @@
+<!DOCUMENTTYPE html>
+<head>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<style type="text/css">
+	.output {
+		height: 300px;
+		width: 400px;
+	}
+	
+	.controlInput {
+		width: 200px;
+		display: block;
+	}
+	.controlName {
+		display: inline;
+		float: left;
+		width: 100px;
+	}
+	
+	.visualValue {
+		display: inline;
+		float: right;
+		text-align: right;
+		width: 100px;
+	}
+	
+	.labels {
+		display: block;
+	}
+	
+	.wholePage {
+		width: 500px;
+	}
+	
+	.video {
+		margin-left: 50px;
+		margin-right: 50px;
+	}
+	
+	.controls {
+		max-width: 500px;
+	}
+	
+	.columnOne {
+		float: left;
+		max-width: 200px;
+		margin: 0px 25px;
+	}
+	
+	.columnTwo {
+		float: right;
+		max-width: 200px;
+	}
+	
+	.control {
+		width: 200px;
+		outline-style: solid;
+		outline-width: 1px;
+	}
+	</style>
+</head>
+<body>
+	<div class="wholePage">
+	<div class="video">
+		<video class="output" id="output" autoplay></video>
+	</div>
+		<div class="controls">
+			<div class="columnOne">
+				<div class="grayscale control">
+					<div class="labels">
+						<label class="controlName">Grayscale</label>
+						<label class="grayscalevisualValue visualValue">0</label>
+					</div>
+					<input class="grayscaleInput controlInput" type="range" min="0" max="100" value="0" onchange="changeValue(this)" />
+				</div>
+				<div class="sepia control">
+					<div class="labels">
+						<label class="controlName">Sepia</label>
+						<label class="sepiavisualValue visualValue">0</label>
+					</div>
+					<input class="sepiaInput controlInput" type="range" min="0" max="100" value="0" onchange="changeValue(this)" />
+				</div>
+				<div class="saturate control">
+					<div class="labels">
+						<label class="controlName">Saturate</label>
+						<label class="saturatevisualValue visualValue">100</label>
+					</div>
+					<input class="saturateInput controlInput" type="range" min="0" max="100" value="100" onchange="changeValue(this)" />
+				</div>
+				<div class="huerotate control">
+					<div class="labels">
+						<label class="controlName">Hue-Rotate</label>
+						<label class="huerotatevisualValue visualValue">0</label>
+					</div>
+					<input class="huerotateInput controlInput" type="range" min="0" max="360" value="0" onchange="changeValue(this)" />
+				</div>
+				<div class="invert control">
+					<div class="labels">
+						<label class="controlName">Invert</label>
+						<label class="invertvisualValue visualValue">0</label>
+					</div>
+					<input class="invertInput controlInput" type="range" min="0" max="100" value="0" onchange="changeValue(this)" />
+				</div>
+			</div>
+			<div class="columnTwo">
+				<div class="opacity control">
+					<div class="labels">
+						<label class="controlName">Opacity</label>
+						<label class="opacityvisualValue visualValue">100</label>
+					</div>
+					<input class="opacityInput controlInput" type="range" min="0" max="100" value="100" onchange="changeValue(this)" />
+				</div>
+				<div class="brightness control">
+					<div class="labels">
+						<label class="controlName">Brightness</label>
+						<label class="brightnessvisualValue visualValue">100</label>
+					</div>
+					<input class="brightnessInput controlInput" type="range" min="0" max="500" value="100" onchange="changeValue(this)" />
+				</div>
+				<div class="contrast control">
+					<div class="labels">
+						<label class="controlName">Contrast</label>
+						<label class="contrastvisualValue visualValue">100</label>
+					</div>
+					<input class="contrastInput controlInput" type="range" min="0" max="300" value="100" onchange="changeValue(this)" />
+				</div>
+				<div class="blur control">
+					<div class="labels">
+						<label class="controlName">Blur</label>
+						<label class="blurvisualValue visualValue">0</label>
+					</div>
+					<input class="blurInput controlInput" type="range" min="0" max="100" value="0" onchange="changeValue(this)" />
+				</div>
+			</div>
+		<div>
+	</div>
+	<script>
+		var n = navigator;
+		var is_webkit = false;
+		var output = document.getElementById("output");	
+		var allFilters = ["grayscale", "sepia", "saturate", "hue-rotate", "invert", "opacity", "brightness", "contrast", "blur"];
+		
+		function changeValue(input) {
+			$(input).parent().find(".visualValue").html($(input).val());
+			
+			var controls = $(input).parent().parent().parent();
+			
+			var filters = new Array();
+			filters[0] = controls.find(".grayscaleInput").val() + "%";
+			filters[1] = controls.find(".sepiaInput").val() + "%";
+			filters[2] = controls.find(".saturateInput").val() + "%";
+			filters[3] = controls.find(".huerotateInput").val() + "deg";
+			filters[4] = controls.find(".invertInput").val() + "%";
+			filters[5] = controls.find(".opacityInput").val() + "%";
+			filters[6] = controls.find(".brightnessInput").val() + "%";
+			filters[7] = controls.find(".contrastInput").val() + "%";
+			filters[8] = (controls.find(".blurInput").val() / 5) + "px";
+			
+			var style = "-webkit-filter:";
+			$.each(filters, function(index, value) {
+				style = style + " " + allFilters[index] + "(" + value + ")";
+			});
+			
+			output.setAttribute("style", style);
+		}
+		
+		function onSuccess(stream) {
+			var source;
+			if (!is_webkit) {
+				source = stream;
+			} else {
+				source = window.webkitURL.createObjectURL(stream);
+			}
+			
+			output.src = source;
+		}
+		
+		function onError(e) {
+			console.log("Reejected", e);
+		}
+		
+		if (n.getUserMedia) {
+			n.getUserMedia({video: true, audio: true}, onSuccess, onError);
+		} else if (n.webkitGetUserMedia) {
+			is_webkit = true;
+			n.webkitGetUserMedia({video:true, audio:true}, onSuccess, onError);
+		} else {
+			// moms, dads, and grandpas
+		}
+		/*
+		$(document).ready(function() {
+			var filter = "-webkit-filter:";
+			$.each(allFilters, function(index, value) {
+				var amount = localStorage.getItem(value);
+				if (amount) {
+					filter = filter + " " + value + "(" + amount + ")";
+				}
+			});
+			
+			output.setAttribute("style", filter);
+		});*/
+	</script>
+</body>
